@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 2</title>
+    <meta charset="UTF-8" />
+    <style>
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .sweet-title {
+            display: flex;
+            align-items: center;
+            color: darkred;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .sweet-title>p {
+            padding-left: 15px;
+        }
+
+        img {
+            width: 13px;
+            height: 13px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="sweet-title">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Black_triangle.svg/540px-Black_triangle.svg.png">
+        <p>Сладости: </p>
+    </div>
+
+    <div class="sweet-list">
+        <p>Пирожное</p>
+        <p>Пончик</p>
+        <p>Мёд</p>
+    </div>
+<script>
+    const title = document.querySelector(".sweet-title");
+
+    function toggleList() {
+        const list = document.querySelector(".sweet-list");
+        const img = document.querySelector("img");
+
+        if(list.style.display === "none") {
+            img.style.transform = "rotate(0deg)";
+            list.style.display = ""
+        } else {
+            img.style.transform = "rotate(180deg)";
+            list.style.display = "none"
+        }
+    }
+
+    title.addEventListener("click", toggleList)
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 1</title>
+    <meta charset="UTF-8" />
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <button>Нажать, чтоб исчезло</button>
+    <p>Какой-то текст</p>
+
+<script>
+    const btn = document.querySelector("button");
+
+    function hideText() {
+        const p = document.querySelector("p");
+        p.style.display = "none";
+    }
+
+    btn.addEventListener("click", hideText)
+
+</script>
+</body>
+
+</html>

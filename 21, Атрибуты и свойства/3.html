@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 3</title>
+    <meta charset="UTF-8" />
+    <style>
+
+        body{
+            padding: 0px 0 0 5px;
+            margin: 0;
+            background-color: #c4df9b;
+        }
+
+        p {
+            margin-top: 0;
+        }
+
+        .hint-tooltip {
+            position: absolute;
+            background-color: white;
+            box-shadow: 1px 1px 1px 1px rgba(34, 60, 80, 0.24);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .all-content {
+            height: 3000px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="all-content">
+        <div class="content-up">
+            <p>ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя</p>
+            <p>ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя ЛяЛяЛя</p>
+        </div>
+        <div class="buttons">
+            <button data-tooltip="эта подсказка длиннее, чем элемент">Короткая кнопка</button>
+            <button data-tooltip="HTML<br>подсказка">Ещё кнопка</button>
+        </div>
+        <div class="content-bottom">
+            <p>Прокрутите страницу, чтобы кнопки оказались у верхнего края, а затем проверьте, правильно ли выводятся подсказки.</p>
+        </div>
+    </div>
+<script>
+
+    let hintDiv;
+    document.addEventListener("mouseover", showHint);
+    document.addEventListener("mouseout", hideHint);
+
+    function showHint(event){
+       let hintContent = event.target.dataset.tooltip;
+       console.log("hintContent", hintContent)
+
+        if(hintContent){
+            let hintDiv = document.createElement("div");
+            hintDiv.className = "hint-tooltip";
+            hintDiv.innerHTML = hintContent;
+            console.log("hintDiv", hintDiv);
+            document.body.append(hintDiv);
+
+            //позиционирование
+            let targetCoords = event.target.getBoundingClientRect();
+
+            let left = targetCoords.left + (event.target.offsetWidth - hintDiv.offsetWidth) / 2;
+            if(left < 0) {
+                left = 0;
+            }
+
+            let top = targetCoords.top - hintDiv.offsetHeight - 5;
+            if(top < 0) {
+                top = targetCoords.top + event.target.offsetHeight + 5;
+            }
+
+            console.log("targetCoords", targetCoords);
+            console.log("left", left);
+            console.log("top", top);
+
+            hintDiv.style.left = `${left}px`;
+            hintDiv.style.top = `${top}px`;
+        }
+    }
+
+    function hideHint() {
+       let removeCandidate = document.querySelector(".hint-tooltip")
+        removeCandidate.remove();
+       }
+
+
+</script>
+</body>
+
+</html>

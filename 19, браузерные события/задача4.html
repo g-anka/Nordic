@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 4</title>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            background-color: darkgray;
+        }
+
+        .field {
+            width: 80%;
+            min-height: 500px;
+            border: 5px solid black;
+            background-color: green;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .ball {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="field">
+        <div class="ball"></div>
+    </div>
+<script>
+    let field = document.querySelector(".field")
+
+    function moveBall(event) {
+        let xPosition = (event.clientX - 35) + "px";
+        let yPosition = (event.clientY - 35) + "px";
+        console.log(event.clientX, event.clientY);
+
+        let ball = document.querySelector(".ball");
+        ball.style.cssText = `
+            position: absolute;
+            top: ${yPosition};
+            left: ${xPosition};
+        `;
+    }
+
+    field.addEventListener("click", moveBall);
+
+</script>
+</body>
+
+</html>

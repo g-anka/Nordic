@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 3</title>
+    <meta charset="UTF-8" />
+    <style>
+        .text-block {
+            width: 50%;
+            background-color: darkkhaki;
+            padding: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="text-block">
+        <h3>Осёл</h3>
+        <p>Это текст об осле</p>
+    </div>
+
+    <div class="text-block">
+        <h3>Кошка</h3>
+        <p>Это текст о кошке</p>
+    </div>
+
+<script>
+    let blocks = document.querySelectorAll(".text-block");
+
+    for(let block of blocks) {
+        console.log("block", block);
+        let createdDiv = document.createElement("div");
+        createdDiv.innerHTML="X";
+        createdDiv.style.cssText = `
+        color: red;
+        font-size: 18px;
+        font-weight: bold;
+        position: absolute;
+        top: 5px;
+        right: 15px;
+        cursor: pointer;
+    `
+        block.appendChild(createdDiv);
+
+        createdDiv.onclick = function (event) {
+            event.target.parentNode.style.display = "none";
+        }
+    }
+
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <button class="btn-pass">Сдать экзамен</button>
+    <div class="result"></div>
+<script>
+    const btnPass = document.querySelector(".btn-pass");
+    const resultDiv = document.querySelector(".result");
+    let flag = false;
+
+    btnPass.onclick = passExam;
+
+    function passExam() {
+        if (flag) {
+            resultDiv.innerHTML = "Подождите! Мы еще не закончили!"
+            return
+        }
+        flag = true;
+        resultDiv.innerHTML = "Определяем оценку...";
+
+        const promise = new Promise(function (resolve, reject) {
+            setTimeout(() => {
+                let score = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+                resolve(score);
+            }, 2000)
+        })
+
+        promise
+            .then((score) => {
+                if (score < 4) {
+                    resultDiv.innerHTML = `Увы, вы получили оценку ${score}!`;
+                } else if (score >= 4)
+                resultDiv.innerHTML = `Ура! Вы сдали экзамен на ${score}!`;
+            })
+            .catch((error) => {
+                resultDiv.innerHTML = `Произошла ошибка: ${error}!`
+            })
+            .finally(() => {
+                flag = false;
+            })
+    }
+</script>
+</body>
+</html>

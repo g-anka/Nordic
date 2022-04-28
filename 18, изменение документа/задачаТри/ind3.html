@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 3</title>
+    <meta charset="UTF-8" />
+    <style>
+        table {
+            border-collapse: collapse;
+            background-color: antiquewhite;
+            margin-bottom: 30px;
+        }
+
+        tr, td, th{
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: burlywood;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+<table>
+    <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Возраст</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>John</td>
+            <td>Smith</td>
+            <td>10</td>
+        </tr>
+        <tr>
+            <td>Pete</td>
+            <td>Brown</td>
+            <td>15</td>
+        </tr>
+        <tr>
+            <td>Ann</td>
+            <td>Lee</td>
+            <td>5</td>
+        </tr>
+    </tbody>
+    </thead>
+</table>
+
+<button>Сортировать по имени</button>
+
+    <script>
+
+        let tr = document.querySelectorAll("tr");
+        console.log("tr", tr);
+        let tBody = document.querySelector("tbody");
+        let table = document.querySelector("table");
+
+        console.log(table.rows);
+
+
+        /*function makeArray(nodeList) {
+            const anArray = [];
+            for(let i = 1; i < nodeList.length; i++) {
+                let item = nodeList[i].firstElementChild.innerText;
+                anArray.push(item);
+                console.log("anArray", anArray);
+            }
+            return anArray;
+        }
+
+        let namesArray = makeArray(tr);
+        console.log("namesArray", namesArray);
+
+        function sortArray(arr){
+            let sorted = [...arr].sort();
+            return sorted;
+        }
+
+        let result = sortArray(namesArray);
+        console.log("result", result);
+
+        //console.log(tBody);
+       table.tBodies[0].append(...result)*/
+
+    </script>
+</body>
+
+</html>

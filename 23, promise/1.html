@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h3>
+        Через какое-то время появится alert, ожидайте
+    </h3>
+<script>
+    function delay(ms) {
+        return new Promise(function(resolve) {
+            setTimeout(() => resolve(ms), ms)
+        })
+    }
+
+    delay(3000).then((ms) => alert(`выполнилось через ${ms/1000} секунды`));
+
+</script>
+</body>
+</html>

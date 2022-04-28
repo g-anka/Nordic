@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 2</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <script>
+    let ul = document.createElement("ul");
+    document.body.prepend(ul)
+
+   do {
+        contentData = prompt("Какой пункт хотите добавить?");
+        console.log("contentData", contentData)
+
+        if(contentData !== null || "") {
+            let li = document.createElement("li");
+            li.textContent = contentData;
+            console.log("li", li)
+            ul.append(li)
+        }
+    } while (contentData !== null || "");
+
+
+
+
+    </script>
+</body>
+
+</html>

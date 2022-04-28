@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Задача 2</title>
+    <meta charset="UTF-8" />
+    <style>
+        button {
+            cursor: pointer;
+        }
+        .tab-content {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .highlight {
+            background-color: cornflowerblue;
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="tabs" id="tabs">
+        <li class="tab-item">
+            <button class="tab-button" id="home" type="button">Home</button>
+        </li>
+        <li class="tab-item">
+            <button class="tab-button" id="profile" type="button">Profile</button>
+        </li>
+        <li class="tab-item" role="presentation">
+            <button class="tab-button" id="contact" type="button">Contact</button>
+        </li>
+    </ul>
+
+    <div>
+        <div class="tab-content" id="home-content">Home content</div>
+        <div class="tab-content" id="profile-content">Profile content</div>
+        <div class="tab-content" id="contact-content">Contact content</div>
+    </div>
+
+<script>
+
+  /*
+  //первый вариант окрашивания табов
+  let selectedBtn;
+
+   function myFunc(event) {
+       highlight(event.target);
+   }
+
+   function highlight(btn) {
+       if(selectedBtn) {
+           console.log(selectedBtn.classList)
+           selectedBtn.classList.remove("highlight");
+       }
+       selectedBtn = btn;
+       selectedBtn.classList.add("highlight");
+   }
+    document.querySelector("ul").onclick = myFunc;*/
+
+  //второй вариант
+  let selectedBtn;
+
+  document.querySelector("#tabs").onclick = function (event) {
+      let button = event.target.closest("button");
+      if(!button) return;
+      if(!button.contains(button)) return;
+      highlight(button);
+  }
+
+  function highlight(btn) {
+      if(selectedBtn) {
+          console.log(selectedBtn.classList)
+          selectedBtn.classList.remove("highlight");
+      }
+      selectedBtn = btn;
+      selectedBtn.classList.add("highlight");
+  }
+
+  const tabContent = document.querySelectorAll(".tab-content");
+  for(let tabContent of tabContent) {
+      tabContent.classList.remove("active");
+  }
+
+  const targetTabContent = document.getElementById(
+
+  )
+
+</script>
+
+
+</body>
+
+</html>
