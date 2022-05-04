@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .result {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+<input class="name-input" placeholder="Введите имя юзера"/>
+<button class="submit-btn">Вывести данные</button>
+<div class="result"></div>
+
+<script>
+    const btn = document.querySelector(".submit-btn");
+
+    function showResult() {
+        const inputValue = document.querySelector(".name-input").value;
+        console.log(inputValue);
+
+        if (inputValue) {
+            fetch(`https://api.github.com/users/${inputValue}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data)
+                    console.log(data.id, data.name, data.avatar_url);
+
+                    const resultDiv = document.querySelector(".result");
+                    const idEl = document.createElement("div");
+                    const nameEl = document.createElement("div");
+                    const avatarEl = document.createElement("img");
+                    avatarEl.src = data.avatar_url;
+
+                    let ID = idEl.innerHTML = data.id;
+                    let name = nameEl.innerHTML = data.name;
+                   // let avatar = avatarEl.src = data.avatar_url;
+                    resultDiv.append(`ID: ${ID}`);
+                    resultDiv.append(`Name: ${name}`);
+                    resultDiv.append(avatarEl);
+                })
+        }
+    }
+        btn.onclick = showResult;
+
+
+</script>
+</body>
+</html>

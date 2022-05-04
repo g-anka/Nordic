@@ -16,11 +16,13 @@
 
     function passExam() {
         if (flag) {
+            console.log("if flag1", flag)
             resultDiv.innerHTML = "Подождите! Мы еще не закончили!"
             return
         }
         flag = true;
         resultDiv.innerHTML = "Определяем оценку...";
+        console.log("flag2", flag)
 
         const promise = new Promise(function (resolve, reject) {
             setTimeout(() => {

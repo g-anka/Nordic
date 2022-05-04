@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Books</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        button {
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Электронная библиотека</h1>
+    <h2>Добавление книги</h2>
+    <form class="form">
+        <input class="input-author" placeholder="Напишите автора"/>
+        <input class="input-title" placeholder="Напишите название книги"/>
+        <button class="add-btn">Добавить</button>
+    </form>
+
+    <h3>Список книг</h3>
+    <div class="books"></div>
+
+<script>
+    const booksDiv = document.querySelector(".books");
+    const addBtn = document.querySelector(".add-btn");
+    const URL = 'https://nordic-books-api.herokuapp.com/books'
+
+    //Создание элементов книги
+    function createBooksElements(arr) {
+        arr.forEach( (item, index) => {
+            console.log("index", index)
+            //создать элементы
+            const divEl = document.createElement("div");
+            const authorEl = document.createElement("p");
+            const titleEl = document.createElement("p");
+            const btnDel = document.createElement("button");
+            const btnEdit = document.createElement("button");
+
+            //добавить классы
+            divEl.classList.add("book-wrapper");
+            authorEl.classList.add("book-author");
+            titleEl.classList.add("book-title");
+            btnDel.classList.add("btn-del");
+            btnEdit.classList.add("btn-edit");
+
+            //добавить контент
+            authorEl.innerText = arr[index].author;
+            titleEl.innerText = arr[index].title;
+            btnDel.innerText = "Удалить";
+            btnEdit.innerText = "Редактировать"
+
+            //вставить элементы куда надо
+            divEl.append(authorEl);
+            divEl.append(titleEl);
+            divEl.append(btnDel);
+            divEl.append(btnEdit);
+            booksDiv.append(divEl);
+        })
+    }
+
+    //Получение всех книг
+    function getBooks() {
+        fetch(URL, {
+            method: 'GET',
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("data", data)
+                createBooksElements(data);
+            })
+            .catch((error) => console.log(error))
+    }
+
+    //Добавление книги
+    addBtn.addEventListener("click", function () {
+        let authorValue = document.querySelector(".input-author").value;
+        let titleValue = document.querySelector(".input-title").value;
+        const data = {
+            author: authorValue,
+            title: titleValue,
+        }
+
+      fetch(URL, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+            }
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("data post", data)
+        })
+        .catch((error) => console.log(error))
+
+        //очистка инпута после добавления новой книги
+        document.querySelector(".form").reset();
+    })
+
+    //Удаление книги
+    booksDiv.addEventListener("click", function (event) {
+        console.log("event.target", event.target)
+        if(event.target.classList.contains("btn-del")) {
+            console.log("YES!");
+            fetch(URL, {
+                method: 'DELETE',
+            })
+
+        }
+    })
+
+    window.onload = getBooks;
+
+</script>
+</body>
+</html>
