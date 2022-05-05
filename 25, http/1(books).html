@@ -9,29 +9,69 @@
             cursor: pointer;
         }
 
+        .hidden {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Электронная библиотека</h1>
-    <h2>Добавление книги</h2>
-    <form class="form">
-        <input class="input-author" placeholder="Напишите автора"/>
-        <input class="input-title" placeholder="Напишите название книги"/>
-        <button class="add-btn">Добавить</button>
-    </form>
+    <div class="library-wrapper">
+        <h1>Электронная библиотека</h1>
+        <h2>Добавление книги</h2>
+        <form class="add-form">
+            <input
+                    type="text"
+                    class="input-author"
+                    placeholder="Автор"/>
+            <input
+                    type="text"
+                    class="input-title"
+                    placeholder="Название книги"/>
+            <button
+                    class="add-btn"
+                    type="submit">Добавить</button>
+        </form>
 
-    <h3>Список книг</h3>
-    <div class="books"></div>
+        <h3>Список книг</h3>
+        <div class="books"></div>
+    </div>
+
+    <div class="edit-wrapper hidden">
+        <h1>Редактирование книги</h1>
+        <form class="edit-form">
+            <input
+                    type="text"
+                    class="edit-author"/>
+            <input
+                    type="text"
+                    class="edit-title"/>
+            <button
+                    class="update-btn"
+                    type="submit">Обновить</button>
+            <button class="cancel-btn">Отмена</button>
+        </form>
+    </div>
 
 <script>
     const booksDiv = document.querySelector(".books");
-    const addBtn = document.querySelector(".add-btn");
+    const addForm = document.querySelector(".add-form");
+    const editForm = document.querySelector(".edit-form");
+    const libraryWrapper = document.querySelector(".library-wrapper");
+    const editWrapper = document.querySelector(".edit-wrapper");
+    const editAuthorInput = document.querySelector(".edit-author");
+    const editTitleInput = document.querySelector(".edit-title");
+    const cancelBtn = document.querySelector(".cancel-btn");
     const URL = 'https://nordic-books-api.herokuapp.com/books'
 
     //Создание элементов книги
     function createBooksElements(arr) {
+        //удалить все дочерние узлы дива books, если они есть
+        // чтоб очистить старые данные и отобразить новые
+        while (booksDiv.firstChild) {
+            booksDiv.removeChild(booksDiv.firstChild);
+        }
         arr.forEach( (item, index) => {
-            console.log("index", index)
             //создать элементы
             const divEl = document.createElement("div");
             const authorEl = document.createElement("p");
@@ -46,6 +86,10 @@
             btnDel.classList.add("btn-del");
             btnEdit.classList.add("btn-edit");
 
+            //Добавить id в атрибут кнопки удаления и редактирования
+            btnDel.setAttribute("data-id", arr[index]._id);
+            btnEdit.setAttribute("data-id", arr[index]._id)
+
             //добавить контент
             authorEl.innerText = arr[index].author;
             titleEl.innerText = arr[index].title;
@@ -53,10 +97,7 @@
             btnEdit.innerText = "Редактировать"
 
             //вставить элементы куда надо
-            divEl.append(authorEl);
-            divEl.append(titleEl);
-            divEl.append(btnDel);
-            divEl.append(btnEdit);
+            divEl.append(authorEl, titleEl, btnDel, btnEdit);
             booksDiv.append(divEl);
         })
     }
@@ -68,34 +109,39 @@
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log("data", data)
+                console.log("data GET", data)
                 createBooksElements(data);
             })
             .catch((error) => console.log(error))
     }
 
     //Добавление книги
-    addBtn.addEventListener("click", function () {
+    addForm.addEventListener("submit", function (event) {
+        event.preventDefault();
         let authorValue = document.querySelector(".input-author").value;
         let titleValue = document.querySelector(".input-title").value;
-        const data = {
+        console.log("DDD", authorValue, titleValue)
+
+        if(!authorValue || !titleValue) {
+            return
+        }
+        const inputData = {
             author: authorValue,
             title: titleValue,
         }
-
-      fetch(URL, {
+        fetch(URL, {
             method: 'POST',
-            body: JSON.stringify(data),
+            body: JSON.stringify(inputData),
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
             }
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log("data post", data)
+            console.log("data POST", data);
+            getBooks();
         })
         .catch((error) => console.log(error))
-
         //очистка инпута после добавления новой книги
         document.querySelector(".form").reset();
     })
@@ -103,15 +149,61 @@
     //Удаление книги
     booksDiv.addEventListener("click", function (event) {
         console.log("event.target", event.target)
+        let currentId = event.target.dataset.id;
+        console.log("currentId: ", currentId);
         if(event.target.classList.contains("btn-del")) {
-            console.log("YES!");
-            fetch(URL, {
+            fetch(`${URL}/${currentId}`, {
                 method: 'DELETE',
             })
+            .then(() => {
+                getBooks();
+                console.log("Выбранная книга и автор удалены");
+            })
+        //Редактирование
+        } else if (event.target.classList.contains("btn-edit")) {
+            libraryWrapper.classList.add("hidden");
+            editWrapper.classList.remove("hidden");
 
+            fetch(`${URL}/${currentId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                editAuthorInput.value = data.author;
+                editTitleInput.value = data.title;
+            })
+            .catch((error) => console.log(error))
         }
+        //обновить данные редактирования
+        editForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            let updatedData = {
+                author: editAuthorInput.value,
+                title: editTitleInput.value,
+            }
+            fetch(`${URL}/${currentId}`, {
+                method: 'PUT',
+                body: JSON.stringify(updatedData),
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                }
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("data PUT", data);
+                    editWrapper.classList.add("hidden");
+                    libraryWrapper.classList.remove("hidden");
+                    getBooks();
+                })
+                .catch((error) => console.log(error))
+        })
     })
 
+    //отмена редактирования
+    cancelBtn.addEventListener("click", function() {
+        editWrapper.classList.add("hidden");
+        libraryWrapper.classList.remove("hidden");
+    })
+
+    //инициализация
     window.onload = getBooks;
 
 </script>
