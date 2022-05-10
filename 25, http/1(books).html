@@ -1,124 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Books</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        button {
-            cursor: pointer;
-        }
+      body {
+        background-color: burlywood;
+      }
 
-        .hidden {
-            display: none;
-        }
+      button {
+        cursor: pointer;
+      }
 
+      .hidden {
+        display: none;
+      }
+
+      .book-cover,
+      .edit-cover-current {
+        max-width: 300px;
+        display: block;
+        margin-bottom: 10px;
+        margin-top: 5px;
+      }
+
+      .lds-ring {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-ring div {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border: 8px solid #fff;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: #fff transparent transparent transparent;
+      }
+      .lds-ring div:nth-child(1) {
+        animation-delay: -0.45s;
+      }
+      .lds-ring div:nth-child(2) {
+        animation-delay: -0.3s;
+      }
+      .lds-ring div:nth-child(3) {
+        animation-delay: -0.15s;
+      }
+      @keyframes lds-ring {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="library-wrapper">
-        <h1>Электронная библиотека</h1>
-        <h2>Добавление книги</h2>
-        <form class="add-form">
-            <input
-                    type="text"
-                    class="input-author"
-                    placeholder="Автор"/>
-            <input
-                    type="text"
-                    class="input-title"
-                    placeholder="Название книги"/>
-            <button
-                    class="add-btn"
-                    type="submit">Добавить</button>
-        </form>
+      <h1>Электронная библиотека</h1>
+      <h2>Добавление книги</h2>
+      <form class="add-form">
+        <input type="text" class="input-author" placeholder="Автор" />
+        <input type="text" class="input-title" placeholder="Название книги" />
+        <input type="file" name="cover" class="input-cover" />
+        <button class="add-btn" type="submit">Добавить</button>
+      </form>
 
-        <h3>Список книг</h3>
-        <div class="books"></div>
+      <h3>Список книг</h3>
+      <div class="loader-wrapper hidden">
+        <div class="lds-ring">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+      <div class="books"></div>
     </div>
 
     <div class="edit-wrapper hidden">
-        <h1>Редактирование книги</h1>
-        <form class="edit-form">
-            <input
-                    type="text"
-                    class="edit-author"/>
-            <input
-                    type="text"
-                    class="edit-title"/>
-            <button
-                    class="update-btn"
-                    type="submit">Обновить</button>
-            <button class="cancel-btn">Отмена</button>
-        </form>
+      <h1>Редактирование книги</h1>
+      <form class="edit-form">
+        <input type="text" class="edit-author" />
+        <input type="text" class="edit-title" />
+        <img class="edit-cover-current" />
+        <p>Загрузите новую обложку, если хотите поменять текущую</p>
+        <input type="file" name="cover" class="edit-cover" />
+        <button class="update-btn" type="submit">Обновить</button>
+        <button class="cancel-btn">Отмена</button>
+      </form>
     </div>
 
-<script>
-    const booksDiv = document.querySelector(".books");
-    const addForm = document.querySelector(".add-form");
-    const editForm = document.querySelector(".edit-form");
-    const libraryWrapper = document.querySelector(".library-wrapper");
-    const editWrapper = document.querySelector(".edit-wrapper");
-    const editAuthorInput = document.querySelector(".edit-author");
-    const editTitleInput = document.querySelector(".edit-title");
-    const cancelBtn = document.querySelector(".cancel-btn");
-    const URL = 'https://nordic-books-api.herokuapp.com/books'
+    <script>
+      const booksDiv = document.querySelector(".books");
+      const addForm = document.querySelector(".add-form");
+      const editForm = document.querySelector(".edit-form");
+      const libraryWrapper = document.querySelector(".library-wrapper");
+      const editWrapper = document.querySelector(".edit-wrapper");
+      const editAuthorInput = document.querySelector(".edit-author");
+      const editTitleInput = document.querySelector(".edit-title");
+      const editCoverInput = document.querySelector(".edit-cover");
+      const editCoverCurrentImg = document.querySelector(".edit-cover-current");
+      const cancelBtn = document.querySelector(".cancel-btn");
+      const inputCover = document.querySelector(".input-cover");
+      const authorInput = document.querySelector(".input-author");
+      const titleInput = document.querySelector(".input-title");
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      const URL = "https://nordic-books-api.herokuapp.com/books";
+      const userId = "g-anka";
 
-    //Создание элементов книги
-    function createBooksElements(arr) {
+      //Создание элементов книги
+      function createBooksElements(arr) {
         //удалить все дочерние узлы дива books, если они есть
         // чтоб очистить старые данные и отобразить новые
         while (booksDiv.firstChild) {
-            booksDiv.removeChild(booksDiv.firstChild);
+          booksDiv.removeChild(booksDiv.firstChild);
         }
-        arr.forEach( (item, index) => {
-            //создать элементы
-            const divEl = document.createElement("div");
-            const authorEl = document.createElement("p");
-            const titleEl = document.createElement("p");
-            const btnDel = document.createElement("button");
-            const btnEdit = document.createElement("button");
+        arr.forEach((item, index) => {
+          //создать элементы
+          const divEl = document.createElement("div");
+          const authorEl = document.createElement("p");
+          const titleEl = document.createElement("p");
+          const coverEl = document.createElement("img");
+          const btnDel = document.createElement("button");
+          const btnEdit = document.createElement("button");
 
-            //добавить классы
-            divEl.classList.add("book-wrapper");
-            authorEl.classList.add("book-author");
-            titleEl.classList.add("book-title");
-            btnDel.classList.add("btn-del");
-            btnEdit.classList.add("btn-edit");
+          //добавить классы
+          divEl.classList.add("book-wrapper");
+          authorEl.classList.add("book-author");
+          titleEl.classList.add("book-title");
+          coverEl.classList.add("book-cover");
+          btnDel.classList.add("btn-del");
+          btnEdit.classList.add("btn-edit");
 
-            //Добавить id в атрибут кнопки удаления и редактирования
-            btnDel.setAttribute("data-id", arr[index]._id);
-            btnEdit.setAttribute("data-id", arr[index]._id)
+          //Добавить id в атрибут кнопки удаления и редактирования
+          btnDel.setAttribute("data-id", arr[index]._id);
+          btnEdit.setAttribute("data-id", arr[index]._id);
 
-            //добавить контент
-            authorEl.innerText = arr[index].author;
-            titleEl.innerText = arr[index].title;
-            btnDel.innerText = "Удалить";
-            btnEdit.innerText = "Редактировать"
+          //добавить контент
+          authorEl.innerText = arr[index].author;
+          titleEl.innerText = arr[index].title;
+          coverEl.src = arr[index].imageUrl;
+          btnDel.innerText = "Удалить";
+          btnEdit.innerText = "Редактировать";
 
-            //вставить элементы куда надо
-            divEl.append(authorEl, titleEl, btnDel, btnEdit);
-            booksDiv.append(divEl);
-        })
-    }
+          //вставить элементы куда надо
+          divEl.append(authorEl, titleEl, coverEl, btnDel, btnEdit);
+          booksDiv.append(divEl);
+        });
+      }
 
-    //Получение всех книг
-    function getBooks() {
+      //Получение всех книг
+      function getBooks() {
+        if (loaderWrapper.classList.contains("hidden")) {
+          loaderWrapper.classList.remove("hidden");
+        }
         fetch(URL, {
-            method: 'GET',
+          method: "GET",
+          headers: { "user-id": userId },
         })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("data GET", data)
-                createBooksElements(data);
-            })
-            .catch((error) => console.log(error))
-    }
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("data GET", data);
+            createBooksElements(data);
+            loaderWrapper.classList.add("hidden");
+          })
+          .catch((error) => console.log(error));
+      }
 
-    //Добавление книги
-    addForm.addEventListener("submit", function (event) {
+      //Добавление книги
+      addForm.addEventListener("submit", function (event) {
         event.preventDefault();
-        let authorValue = document.querySelector(".input-author").value;
+
+        /*
+       //без добавления обложки
+       let authorValue = document.querySelector(".input-author").value;
         let titleValue = document.querySelector(".input-title").value;
         console.log("DDD", authorValue, titleValue)
 
@@ -142,70 +205,94 @@
             getBooks();
         })
         .catch((error) => console.log(error))
-        //очистка инпута после добавления новой книги
-        document.querySelector(".form").reset();
-    })
+        */
 
-    //Удаление книги
-    booksDiv.addEventListener("click", function (event) {
-        console.log("event.target", event.target)
+        //C добавлением изображения обложки книги
+        const formData = new FormData();
+        formData.append("author", authorInput.value);
+        formData.append("title", titleInput.value);
+        formData.append("cover", inputCover.files[0]);
+
+        loaderWrapper.classList.remove("hidden");
+        fetch(URL, {
+          method: "POST",
+          headers: { "user-id": userId },
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then(() => {
+            getBooks();
+            console.log("Новая книга добавлена");
+          });
+
+        //очистка инпутов после добавления новой книги
+        document.querySelector(".add-form").reset();
+      });
+
+      //Удаление книги
+      booksDiv.addEventListener("click", function (event) {
+        console.log("event.target", event.target);
         let currentId = event.target.dataset.id;
         console.log("currentId: ", currentId);
-        if(event.target.classList.contains("btn-del")) {
-            fetch(`${URL}/${currentId}`, {
-                method: 'DELETE',
-            })
-            .then(() => {
-                getBooks();
-                console.log("Выбранная книга и автор удалены");
-            })
-        //Редактирование
+        if (event.target.classList.contains("btn-del")) {
+          fetch(`${URL}/${currentId}`, {
+            method: "DELETE",
+            headers: { "user-id": userId },
+          }).then(() => {
+            getBooks();
+            console.log("Выбранная книга и автор удалены");
+          });
+          //Редактирование
         } else if (event.target.classList.contains("btn-edit")) {
-            libraryWrapper.classList.add("hidden");
-            editWrapper.classList.remove("hidden");
+          libraryWrapper.classList.add("hidden");
+          editWrapper.classList.remove("hidden");
 
-            fetch(`${URL}/${currentId}`)
+          fetch(`${URL}/${currentId}`)
             .then((response) => response.json())
             .then((data) => {
-                editAuthorInput.value = data.author;
-                editTitleInput.value = data.title;
+              console.log("data EDIT", data);
+              editAuthorInput.value = data.author;
+              editTitleInput.value = data.title;
+              editCoverCurrentImg.src = data.imageUrl;
             })
-            .catch((error) => console.log(error))
+            .catch((error) => console.log(error));
         }
         //обновить данные редактирования
-        editForm.addEventListener("submit", function(event) {
-            event.preventDefault();
-            let updatedData = {
-                author: editAuthorInput.value,
-                title: editTitleInput.value,
-            }
-            fetch(`${URL}/${currentId}`, {
-                method: 'PUT',
-                body: JSON.stringify(updatedData),
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                }
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log("data PUT", data);
-                    editWrapper.classList.add("hidden");
-                    libraryWrapper.classList.remove("hidden");
-                    getBooks();
-                })
-                .catch((error) => console.log(error))
-        })
-    })
+        editForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          const formData = new FormData();
+          formData.append("author", editAuthorInput.value);
+          formData.append("title", editTitleInput.value);
+          formData.append("cover", editCoverInput.files[0]);
 
-    //отмена редактирования
-    cancelBtn.addEventListener("click", function() {
+          fetch(`${URL}/${currentId}`, {
+            method: "PUT",
+            headers: { "user-id": userId },
+            body: formData,
+            /* headers: {
+                    'Content-Type': 'multipart/form-data',
+                }*/
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("data PUT", data);
+              editWrapper.classList.add("hidden");
+              libraryWrapper.classList.remove("hidden");
+              getBooks();
+              console.log("Данные книги отредактированы!");
+            })
+            .catch((error) => console.log(error));
+        });
+      });
+
+      //отмена редактирования
+      cancelBtn.addEventListener("click", function () {
         editWrapper.classList.add("hidden");
         libraryWrapper.classList.remove("hidden");
-    })
+      });
 
-    //инициализация
-    window.onload = getBooks;
-
-</script>
-</body>
+      //инициализация
+      window.onload = getBooks;
+    </script>
+  </body>
 </html>
