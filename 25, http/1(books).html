@@ -99,10 +99,11 @@
     </div>
 
     <script>
+      const libraryWrapper = document.querySelector(".library-wrapper");
       const booksDiv = document.querySelector(".books");
       const addForm = document.querySelector(".add-form");
       const editForm = document.querySelector(".edit-form");
-      const libraryWrapper = document.querySelector(".library-wrapper");
+      const commentForm = document.querySelector(".comment-form");
       const editWrapper = document.querySelector(".edit-wrapper");
       const editAuthorInput = document.querySelector(".edit-author");
       const editTitleInput = document.querySelector(".edit-title");
@@ -113,10 +114,10 @@
       const authorInput = document.querySelector(".input-author");
       const titleInput = document.querySelector(".input-title");
       const loaderWrapper = document.querySelector(".loader-wrapper");
-      const URL = "https://nordic-books-api.herokuapp.com/books";
+      const URL = "https://nordic-books-api.herokuapp.com";
       const userId = "g-anka";
 
-      //Создание элементов книги
+      //СОЗДАНИЕ ЭЛЕМЕНТОВ КНИГИ
       function createBooksElements(arr) {
         //удалить все дочерние узлы дива books, если они есть
         // чтоб очистить старые данные и отобразить новые
@@ -124,97 +125,61 @@
           booksDiv.removeChild(booksDiv.firstChild);
         }
         arr.forEach((item, index) => {
-          //создать элементы
-          const divEl = document.createElement("div");
-          const authorEl = document.createElement("p");
-          const titleEl = document.createElement("p");
-          const coverEl = document.createElement("img");
-          const btnDel = document.createElement("button");
-          const btnEdit = document.createElement("button");
+          booksDiv.insertAdjacentHTML("beforeend",
+          `
+          <div class="book-wrapper">
+            <div class="book-body">
+                <p class="book-author">${arr[index].author}</p>
+                <p class="book-title">${arr[index].title}</p>
+                <img class="book-cover" src="${arr[index].imageUrl}"/>
+                <div>
+                    <button class="btn-del" data-id="${arr[index]._id}">Удалить</button>
+                    <button class="btn-edit" data-id="${arr[index]._id}">Редактировать</button>
+                    <button class="btn-comment" data-id="${arr[index]._id}">Показать комментарии</button>
+                </div>
+            </div>
+            <div class="book-comments">
 
-          //добавить классы
-          divEl.classList.add("book-wrapper");
-          authorEl.classList.add("book-author");
-          titleEl.classList.add("book-title");
-          coverEl.classList.add("book-cover");
-          btnDel.classList.add("btn-del");
-          btnEdit.classList.add("btn-edit");
-
-          //Добавить id в атрибут кнопки удаления и редактирования
-          btnDel.setAttribute("data-id", arr[index]._id);
-          btnEdit.setAttribute("data-id", arr[index]._id);
-
-          //добавить контент
-          authorEl.innerText = arr[index].author;
-          titleEl.innerText = arr[index].title;
-          coverEl.src = arr[index].imageUrl;
-          btnDel.innerText = "Удалить";
-          btnEdit.innerText = "Редактировать";
-
-          //вставить элементы куда надо
-          divEl.append(authorEl, titleEl, coverEl, btnDel, btnEdit);
-          booksDiv.append(divEl);
+            </div>
+          </div>
+          `)
         });
       }
 
-      //Получение всех книг
-      function getBooks() {
-        if (loaderWrapper.classList.contains("hidden")) {
-          loaderWrapper.classList.remove("hidden");
-        }
-        fetch(URL, {
-          method: "GET",
-          headers: { "user-id": userId },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("data GET", data);
-            createBooksElements(data);
-            loaderWrapper.classList.add("hidden");
+      //ПОЛУЧЕНИЕ ВСЕХ КНИГ
+      async function getBooks() {
+        try {
+          if (loaderWrapper.classList.contains("hidden")) {
+            loaderWrapper.classList.remove("hidden");
+          }
+          const response = await fetch(`${URL}/books`, {
+            method: "GET",
+            headers: {"user-id": userId},
           })
-          .catch((error) => console.log(error));
+          const books = await response.json()
+          return books
+        } catch (error) {
+          console.log("Произошла ошибка!", error)
+        }
       }
 
-      //Добавление книги
+      getBooks().then((books) => {
+        console.log("data GET", books.data);
+        createBooksElements(books.data);
+        loaderWrapper.classList.add("hidden");
+      })
+
+
+      //ДОБАВЛЕНИЕ КНИГИ
       addForm.addEventListener("submit", function (event) {
         event.preventDefault();
-
-        /*
-       //без добавления обложки
-       let authorValue = document.querySelector(".input-author").value;
-        let titleValue = document.querySelector(".input-title").value;
-        console.log("DDD", authorValue, titleValue)
-
-        if(!authorValue || !titleValue) {
-            return
-        }
-        const inputData = {
-            author: authorValue,
-            title: titleValue,
-        }
-        fetch(URL, {
-            method: 'POST',
-            body: JSON.stringify(inputData),
-            headers: {
-                'Content-Type': 'application/json; charset=UTF-8',
-            }
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("data POST", data);
-            getBooks();
-        })
-        .catch((error) => console.log(error))
-        */
-
-        //C добавлением изображения обложки книги
         const formData = new FormData();
         formData.append("author", authorInput.value);
         formData.append("title", titleInput.value);
         formData.append("cover", inputCover.files[0]);
 
         loaderWrapper.classList.remove("hidden");
-        fetch(URL, {
+        fetch(`${URL}/books`, {
           method: "POST",
           headers: { "user-id": userId },
           body: formData,
@@ -229,25 +194,25 @@
         document.querySelector(".add-form").reset();
       });
 
-      //Удаление книги
+      //УДАЛЕНИЕ КНИГИ
       booksDiv.addEventListener("click", function (event) {
         console.log("event.target", event.target);
         let currentId = event.target.dataset.id;
         console.log("currentId: ", currentId);
         if (event.target.classList.contains("btn-del")) {
-          fetch(`${URL}/${currentId}`, {
+          fetch(`${URL}/books/${currentId}`, {
             method: "DELETE",
             headers: { "user-id": userId },
           }).then(() => {
             getBooks();
             console.log("Выбранная книга и автор удалены");
           });
-          //Редактирование
+          //РЕДАКТИРОВАНИЕ
         } else if (event.target.classList.contains("btn-edit")) {
           libraryWrapper.classList.add("hidden");
           editWrapper.classList.remove("hidden");
 
-          fetch(`${URL}/${currentId}`)
+          fetch(`${URL}/books/${currentId}`)
             .then((response) => response.json())
             .then((data) => {
               console.log("data EDIT", data);
@@ -265,7 +230,7 @@
           formData.append("title", editTitleInput.value);
           formData.append("cover", editCoverInput.files[0]);
 
-          fetch(`${URL}/${currentId}`, {
+          fetch(`${URL}/books/${currentId}`, {
             method: "PUT",
             headers: { "user-id": userId },
             body: formData,
@@ -290,6 +255,56 @@
         editWrapper.classList.add("hidden");
         libraryWrapper.classList.remove("hidden");
       });
+
+      //ПОКАЗАТЬ РАЗДЕЛ КОММЕНТАРИЕВ
+      booksDiv.addEventListener("click", function (event) {
+        const bookComments = document.querySelector(".book-comments");
+        if (!event.target.classList.contains("btn-comment")) {
+          return
+        } else if (event.target.innerText === "Показать комментарии") {
+          bookComments.insertAdjacentHTML("beforeend",
+          `
+          <h2>Добавить новый комментарий</h2>
+             <form class="comment-form">
+               <input type="text" class="comment-name" placeholder="Ваше имя"/>
+               <textarea class="comment-text" placeholder="Ваш комментарий"></textarea>
+               <button class="btn-send-comment" type="submit">Отправить</button>
+             </form>
+        `);
+          event.target.innerText = 'Скрыть комментарии';
+        } else if (event.target.innerText === "Скрыть комментарии") {
+            event.target.innerText = 'Показать комментарии';
+            while (bookComments.firstChild) {
+              bookComments.removeChild(bookComments.firstChild);
+            }
+        }
+      })
+
+      //ДОБАВИТЬ КОММЕНТАРИЙ
+      if(commentForm) {
+        commentForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          console.log("works")
+        })
+      }
+
+      /*const name = event.target.querySelector(".comment-name").value;
+        const text = event.target.querySelector(".comment-text").value;
+
+        if(name & text) {
+          console.log("AAA", name, text)
+        }
+
+        fetch(`${URL}/books/${id}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          text,
+        }),
+      })
+      })
+      */
 
       //инициализация
       window.onload = getBooks;
