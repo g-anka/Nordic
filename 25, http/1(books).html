@@ -4,13 +4,23 @@
     <meta charset="UTF-8" />
     <title>Books</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
     <style>
       body {
-        background-color: burlywood;
+        background-color: #c4df9b;
       }
-
-      button {
-        cursor: pointer;
+      p {
+        margin: 0px;
       }
 
       .hidden {
@@ -38,10 +48,10 @@
         width: 64px;
         height: 64px;
         margin: 8px;
-        border: 8px solid #fff;
+        border: 8px solid gray;
         border-radius: 50%;
         animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        border-color: #fff transparent transparent transparent;
+        border-color: gray transparent transparent transparent;
       }
       .lds-ring div:nth-child(1) {
         animation-delay: -0.45s;
@@ -63,41 +73,115 @@
     </style>
   </head>
   <body>
-    <div class="library-wrapper">
-      <h1>Электронная библиотека</h1>
-      <h2>Добавление книги</h2>
-      <form class="add-form">
-        <input type="text" class="input-author" placeholder="Автор" />
-        <input type="text" class="input-title" placeholder="Название книги" />
-        <input type="file" name="cover" class="input-cover" />
-        <button class="add-btn" type="submit">Добавить</button>
-      </form>
+    <div class="container">
+      <div class="library-wrapper">
+        <h1>Электронная библиотека</h1>
+        <h2>Добавление книги</h2>
+        <div class="raw justify-content-md-center">
+          <div class="col col-12 col-sm-6">
+            <form class="add-form">
+              <input
+                type="text"
+                class="input-author form-control mb-2"
+                placeholder="Автор"
+              />
+              <input
+                type="text"
+                class="input-title form-control mb-2"
+                placeholder="Название книги"
+              />
+              <input
+                type="file"
+                name="cover"
+                class="input-cover form-control mb-4"
+              />
+              <button class="add-btn btn btn-success" type="submit">
+                Добавить
+              </button>
+            </form>
+          </div>
+        </div>
 
-      <h3>Список книг</h3>
-      <div class="loader-wrapper hidden">
-        <div class="lds-ring">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+        <h3>Список книг</h3>
+        <div class="loader-wrapper hidden">
+          <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="books"></div>
+      </div>
+
+      <div class="edit-wrapper hidden">
+        <h1>Редактирование книги</h1>
+        <form class="edit-form">
+          <input type="text" class="edit-author form-control" />
+          <input type="text" class="edit-title form-control" />
+          <img class="edit-cover-current" />
+          <p>Загрузите новую обложку, если хотите поменять текущую</p>
+          <input type="file" name="cover" class="edit-cover form-control" />
+          <button class="update-btn btn btn-success" type="submit">
+            Обновить
+          </button>
+          <button class="cancel-btn btn btn-danger">Отмена</button>
+        </form>
+      </div>
+
+      <div
+        class="modal fade"
+        id="modal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">
+                Редактирование книги
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form class="edit-form">
+                <input
+                  type="text"
+                  class="edit-author form-control mb-2"
+                  value=""
+                />
+                <input type="text" class="edit-title form-control mb-2" />
+                <img class="edit-cover-current mb-2" />
+                <p>Загрузите новую обложку, если хотите поменять текущую</p>
+                <input
+                  type="file"
+                  name="cover"
+                  class="edit-cover form-control"
+                />
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button submit"
+                class="update-btn btn btn-success"
+                data-bs-dismiss="modal"
+              >
+                Обновить
+              </button>
+              <button type="button" class="cancel-btn btn btn-danger">
+                Отмена
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="books"></div>
     </div>
-
-    <div class="edit-wrapper hidden">
-      <h1>Редактирование книги</h1>
-      <form class="edit-form">
-        <input type="text" class="edit-author" />
-        <input type="text" class="edit-title" />
-        <img class="edit-cover-current" />
-        <p>Загрузите новую обложку, если хотите поменять текущую</p>
-        <input type="file" name="cover" class="edit-cover" />
-        <button class="update-btn" type="submit">Обновить</button>
-        <button class="cancel-btn">Отмена</button>
-      </form>
-    </div>
-
     <script>
       const libraryWrapper = document.querySelector(".library-wrapper");
       const booksDiv = document.querySelector(".books");
@@ -114,6 +198,7 @@
       const authorInput = document.querySelector(".input-author");
       const titleInput = document.querySelector(".input-title");
       const loaderWrapper = document.querySelector(".loader-wrapper");
+      const myModal = new bootstrap.Modal(document.getElementById("modal"));
       const URL = "https://nordic-books-api.herokuapp.com";
       const userId = "g-anka";
 
@@ -125,24 +210,31 @@
           booksDiv.removeChild(booksDiv.firstChild);
         }
         arr.forEach((item, index) => {
-          booksDiv.insertAdjacentHTML("beforeend",
-          `
-          <div class="book-wrapper">
-            <div class="book-body">
-                <p class="book-author">${arr[index].author}</p>
-                <p class="book-title">${arr[index].title}</p>
-                <img class="book-cover" src="${arr[index].imageUrl}"/>
-                <div>
-                    <button class="btn-del" data-id="${arr[index]._id}">Удалить</button>
-                    <button class="btn-edit" data-id="${arr[index]._id}">Редактировать</button>
-                    <button class="btn-comment" data-id="${arr[index]._id}">Показать комментарии</button>
+          booksDiv.insertAdjacentHTML(
+            "beforeend",
+            `
+              <div class="book-wrapper card mb-4 p-4">
+                <div class="book-body">
+                    <p class="book-author h6">${arr[index].author}</p>
+                    <p class="book-title h5">${arr[index].title}</p>
+                    <img class="book-cover" src="${arr[index].imageUrl}"/>
+                    <div>
+                        <button
+                            class="btn-comment btn btn-primary"
+                               data-id="${arr[index]._id}">Показать комментарии</button>
+                        <button
+                            class="btn-edit btn btn-primary"
+                            data-id="${arr[index]._id}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal">Редактировать</button>
+                        <button class="btn-del btn btn-danger me-2" data-id="${arr[index]._id}">Удалить</button>
+                    </div>
                 </div>
-            </div>
-            <div class="book-comments">
-
-            </div>
-          </div>
-          `)
+                <div class="book-comments">
+                </div>
+              </div>
+              `
+          );
         });
       }
 
@@ -154,12 +246,12 @@
           }
           const response = await fetch(`${URL}/books`, {
             method: "GET",
-            headers: {"user-id": userId},
-          })
-          const books = await response.json()
-          return books
+            headers: { "user-id": userId },
+          });
+          const books = await response.json();
+          return books;
         } catch (error) {
-          console.log("Произошла ошибка!", error)
+          console.log("Произошла ошибка!", error);
         }
       }
 
@@ -167,8 +259,7 @@
         console.log("data GET", books.data);
         createBooksElements(books.data);
         loaderWrapper.classList.add("hidden");
-      })
-
+      });
 
       //ДОБАВЛЕНИЕ КНИГИ
       addForm.addEventListener("submit", function (event) {
@@ -209,19 +300,19 @@
           });
           //РЕДАКТИРОВАНИЕ
         } else if (event.target.classList.contains("btn-edit")) {
-          libraryWrapper.classList.add("hidden");
-          editWrapper.classList.remove("hidden");
-
-          fetch(`${URL}/books/${currentId}`)
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("data EDIT", data);
-              editAuthorInput.value = data.author;
-              editTitleInput.value = data.title;
-              editCoverCurrentImg.src = data.imageUrl;
-            })
-            .catch((error) => console.log(error));
+          myModal.show();
+          /* fetch(`${URL}/books/${currentId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                  console.log("data EDIT", data);
+                  editAuthorInput.value = "новок";
+                  editTitleInput.value = data.title;
+                  editCoverCurrentImg.src = data.imageUrl;
+                  console.log("AAA", data.author);
+                })
+                .catch((error) => console.log(error));*/
         }
+
         //обновить данные редактирования
         editForm.addEventListener("submit", function (event) {
           event.preventDefault();
@@ -229,7 +320,6 @@
           formData.append("author", editAuthorInput.value);
           formData.append("title", editTitleInput.value);
           formData.append("cover", editCoverInput.files[0]);
-
           fetch(`${URL}/books/${currentId}`, {
             method: "PUT",
             headers: { "user-id": userId },
@@ -251,50 +341,51 @@
       });
 
       //отмена редактирования
+      console.log("KK", cancelBtn);
       cancelBtn.addEventListener("click", function () {
-        editWrapper.classList.add("hidden");
-        libraryWrapper.classList.remove("hidden");
+        console.log("отмена");
+        myModal.hide();
       });
 
       //ПОКАЗАТЬ РАЗДЕЛ КОММЕНТАРИЕВ
       booksDiv.addEventListener("click", function (event) {
         const bookComments = document.querySelector(".book-comments");
         if (!event.target.classList.contains("btn-comment")) {
-          return
+          return;
         } else if (event.target.innerText === "Показать комментарии") {
-          bookComments.insertAdjacentHTML("beforeend",
-          `
-          <h2>Добавить новый комментарий</h2>
-             <form class="comment-form">
-               <input type="text" class="comment-name" placeholder="Ваше имя"/>
-               <textarea class="comment-text" placeholder="Ваш комментарий"></textarea>
-               <button class="btn-send-comment" type="submit">Отправить</button>
-             </form>
-        `);
-          event.target.innerText = 'Скрыть комментарии';
+          bookComments.insertAdjacentHTML(
+            "beforeend",
+            `
+              <h2>Добавить новый комментарий</h2>
+                 <form class="comment-form">
+                   <input type="text" class="comment-name" placeholder="Ваше имя"/>
+                   <textarea class="comment-text" placeholder="Ваш комментарий"></textarea>
+                   <button class="btn-send-comment" type="submit">Отправить</button>
+                 </form>
+            `
+          );
+          event.target.innerText = "Скрыть комментарии";
         } else if (event.target.innerText === "Скрыть комментарии") {
-            event.target.innerText = 'Показать комментарии';
-            while (bookComments.firstChild) {
-              bookComments.removeChild(bookComments.firstChild);
-            }
+          event.target.innerText = "Показать комментарии";
+          while (bookComments.firstChild) {
+            bookComments.removeChild(bookComments.firstChild);
+          }
         }
-      })
+      });
 
       //ДОБАВИТЬ КОММЕНТАРИЙ
-      if(commentForm) {
+      if (commentForm) {
         commentForm.addEventListener("submit", function (event) {
           event.preventDefault();
-          console.log("works")
-        })
+          console.log("works");
+        });
       }
 
       /*const name = event.target.querySelector(".comment-name").value;
         const text = event.target.querySelector(".comment-text").value;
-
         if(name & text) {
           console.log("AAA", name, text)
         }
-
         fetch(`${URL}/books/${id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
