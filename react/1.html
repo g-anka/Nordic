@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+</head>
+<body>
+    <div id="root"></div>
+<script type="text/babel">
+
+
+   const element = React.createElement;
+
+   function formUser(user) {
+       return user.firstName + ' ' + user.lastName
+   }
+
+   const user = {
+       firstName: "Web",
+       lastName: "Designer",
+       avatarUrl: "https://i.ytimg.com/vi/c1Xds-4tvQ4/maxresdefault.jpg"
+   }
+
+    class LikeButton extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { liked: false };
+        }
+
+        render() {
+            //const name = "Иван-Царевич";
+            return (
+            <div>
+                <h1>Здравствуй, {formUser(user)}!</h1>
+                <img
+                    src={user.avatarUrl}
+                    alt="Аватарка"
+                    style={{ maxWidth: 400 }}
+                />
+            </div>
+            )
+          /*  if (this.state.liked) {
+                return 'You liked this.';
+            }
+
+            return (
+                <button onClick={() => this.setState({ liked: true })}>Like</button>
+            )*/
+
+         /*   return element(
+                'button',
+                { onClick: () => this.setState({ liked: true }) },
+                'Like'
+            );*/
+        }
+    }
+
+    const domContainer = document.querySelector('#root');
+    ReactDOM.render(element(LikeButton), domContainer);
+</script>
+</body>
+</html>
