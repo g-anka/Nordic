@@ -114,21 +114,6 @@
         <div class="books"></div>
       </div>
 
-      <div class="edit-wrapper hidden">
-        <h1>Редактирование книги</h1>
-        <form class="edit-form">
-          <input type="text" class="edit-author form-control" />
-          <input type="text" class="edit-title form-control" />
-          <img class="edit-cover-current" />
-          <p>Загрузите новую обложку, если хотите поменять текущую</p>
-          <input type="file" name="cover" class="edit-cover form-control" />
-          <button class="update-btn btn btn-success" type="submit">
-            Обновить
-          </button>
-          <button class="cancel-btn btn btn-danger">Отмена</button>
-        </form>
-      </div>
-
       <div
         class="modal fade"
         id="modal"
@@ -151,11 +136,7 @@
             </div>
             <div class="modal-body">
               <form class="edit-form">
-                <input
-                  type="text"
-                  class="edit-author form-control mb-2"
-                  value=""
-                />
+                <input type="text" class="edit-author form-control mb-2" />
                 <input type="text" class="edit-title form-control mb-2" />
                 <img class="edit-cover-current mb-2" />
                 <p>Загрузите новую обложку, если хотите поменять текущую</p>
@@ -164,19 +145,17 @@
                   name="cover"
                   class="edit-cover form-control"
                 />
+                <button
+                  type="submit"
+                  class="update-btn btn btn-success"
+                  data-bs-dismiss="modal"
+                >
+                  Обновить
+                </button>
+                <button type="submit" class="cancel-btn btn btn-danger">
+                  Отмена
+                </button>
               </form>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button submit"
-                class="update-btn btn btn-success"
-                data-bs-dismiss="modal"
-              >
-                Обновить
-              </button>
-              <button type="button" class="cancel-btn btn btn-danger">
-                Отмена
-              </button>
             </div>
           </div>
         </div>
@@ -301,49 +280,46 @@
           //РЕДАКТИРОВАНИЕ
         } else if (event.target.classList.contains("btn-edit")) {
           myModal.show();
-          /* fetch(`${URL}/books/${currentId}`)
-                .then((response) => response.json())
-                .then((data) => {
-                  console.log("data EDIT", data);
-                  editAuthorInput.value = "новок";
-                  editTitleInput.value = data.title;
-                  editCoverCurrentImg.src = data.imageUrl;
-                  console.log("AAA", data.author);
-                })
-                .catch((error) => console.log(error));*/
+          fetch(`${URL}/books/${currentId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("data EDIT", data);
+              editAuthorInput.value = data.author;
+              editTitleInput.value = data.title;
+              editCoverCurrentImg.src = data.imageUrl;
+            })
+            .catch((error) => console.log(error));
         }
 
         //обновить данные редактирования
         editForm.addEventListener("submit", function (event) {
           event.preventDefault();
+          console.log("btn submit is clicked");
           const formData = new FormData();
           formData.append("author", editAuthorInput.value);
           formData.append("title", editTitleInput.value);
           formData.append("cover", editCoverInput.files[0]);
+          console.log("FD", FormData);
           fetch(`${URL}/books/${currentId}`, {
             method: "PUT",
             headers: { "user-id": userId },
             body: formData,
-            /* headers: {
-                    'Content-Type': 'multipart/form-data',
-                }*/
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           })
             .then((response) => response.json())
             .then((data) => {
               console.log("data PUT", data);
-              editWrapper.classList.add("hidden");
-              libraryWrapper.classList.remove("hidden");
+              myModal.hide();
               getBooks();
               console.log("Данные книги отредактированы!");
             })
             .catch((error) => console.log(error));
         });
       });
-
       //отмена редактирования
-      console.log("KK", cancelBtn);
       cancelBtn.addEventListener("click", function () {
-        console.log("отмена");
         myModal.hide();
       });
 
