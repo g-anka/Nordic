@@ -70,6 +70,27 @@
           transform: rotate(360deg);
         }
       }
+
+      .pagination-ul {
+        display: flex;
+      }
+
+      .page {
+        cursor: pointer;
+        list-style-type: none;
+        margin-right: 25px;
+      }
+
+      .page:hover {
+        color: red;
+        font-weight: bold;
+      }
+
+      .active {
+        color: blue;
+        font-weight: bold;
+      }
+
     </style>
   </head>
   <body>
@@ -111,7 +132,13 @@
             <div></div>
           </div>
         </div>
-        <div class="books"></div>
+        <div class="books">
+        </div>
+      </div>
+
+      <div class="pagination-wrapper">
+        <ul class="pagination-ul">
+        </ul>
       </div>
 
       <div
@@ -177,6 +204,7 @@
       const authorInput = document.querySelector(".input-author");
       const titleInput = document.querySelector(".input-title");
       const loaderWrapper = document.querySelector(".loader-wrapper");
+      const paginationUl = document.querySelector(".pagination-ul");
       const myModal = new bootstrap.Modal(document.getElementById("modal"));
       const URL = "https://nordic-books-api.herokuapp.com";
       const userId = "g-anka";
@@ -215,6 +243,7 @@
               `
           );
         });
+        console.log("created elements")
       }
 
       //ПОЛУЧЕНИЕ ВСЕХ КНИГ
@@ -225,20 +254,32 @@
           }
           const response = await fetch(`${URL}/books`, {
             method: "GET",
-            headers: { "user-id": userId },
+           // headers: { "user-id": userId },
           });
           const books = await response.json();
+          console.log("BOOKS", books);
           return books;
         } catch (error) {
           console.log("Произошла ошибка!", error);
         }
       }
 
-      getBooks().then((books) => {
-        console.log("data GET", books.data);
-        createBooksElements(books.data);
+      function updateBooksList() {
+        getBooks().then((books) => {
+        console.log("data GET", books);
+
+        let currentPage = books.page;
+        let totalPages = books.totalPages;
+        console.log("currentPage", currentPage);
+        console.log("totalPages", totalPages)
+
         loaderWrapper.classList.add("hidden");
+        createBooksElements(books.data);
+        createPagination(currentPage, totalPages);
       });
+      }
+
+
 
       //ДОБАВЛЕНИЕ КНИГИ
       addForm.addEventListener("submit", function (event) {
@@ -247,8 +288,7 @@
         formData.append("author", authorInput.value);
         formData.append("title", titleInput.value);
         formData.append("cover", inputCover.files[0]);
-
-        loaderWrapper.classList.remove("hidden");
+        console.log("FD1", formData);
         fetch(`${URL}/books`, {
           method: "POST",
           headers: { "user-id": userId },
@@ -256,25 +296,27 @@
         })
           .then((res) => res.json())
           .then(() => {
-            getBooks();
+            updateBooksList();
             console.log("Новая книга добавлена");
           });
-
         //очистка инпутов после добавления новой книги
         document.querySelector(".add-form").reset();
       });
+
+
 
       //УДАЛЕНИЕ КНИГИ
       booksDiv.addEventListener("click", function (event) {
         console.log("event.target", event.target);
         let currentId = event.target.dataset.id;
         console.log("currentId: ", currentId);
+
         if (event.target.classList.contains("btn-del")) {
           fetch(`${URL}/books/${currentId}`, {
             method: "DELETE",
             headers: { "user-id": userId },
           }).then(() => {
-            getBooks();
+            updateBooksList();
             console.log("Выбранная книга и автор удалены");
           });
           //РЕДАКТИРОВАНИЕ
@@ -290,29 +332,28 @@
             })
             .catch((error) => console.log(error));
         }
-
         //обновить данные редактирования
         editForm.addEventListener("submit", function (event) {
           event.preventDefault();
           console.log("btn submit is clicked");
-          const formData = new FormData();
-          formData.append("author", editAuthorInput.value);
-          formData.append("title", editTitleInput.value);
-          formData.append("cover", editCoverInput.files[0]);
-          console.log("FD", FormData);
+          const editedData = new FormData();
+          editedData.append("author", editAuthorInput.value);
+          editedData.append("title", editTitleInput.value);
+          editedData.append("cover", editCoverInput.files[0]);
+          console.log("FD", editedData);
           fetch(`${URL}/books/${currentId}`, {
             method: "PUT",
-            headers: { "user-id": userId },
-            body: formData,
             headers: {
-              "Content-Type": "multipart/form-data",
+              "user-id": userId,
+            //  "Content-Type": "multipart/form-data", // не работает с этим заголовком
             },
+            body: editedData,
           })
             .then((response) => response.json())
             .then((data) => {
               console.log("data PUT", data);
               myModal.hide();
-              getBooks();
+              updateBooksList();
               console.log("Данные книги отредактированы!");
             })
             .catch((error) => console.log(error));
@@ -373,8 +414,21 @@
       })
       */
 
+      //ПАГИНАЦИЯ
+      function createPagination(currentPage, totalPages) {
+        for (let i = 0; i < totalPages; i++) {
+          paginationUl.insertAdjacentHTML( "beforeEnd",
+          `
+            <li class="page" ${i === currentPage ? 'active' : ''}
+                <a class="page-link" href="#" data-page="${i}">${i + 1}</a>
+            </li>
+          `
+          )
+        }
+      }
+
       //инициализация
-      window.onload = getBooks;
+      window.onload = updateBooksList;
     </script>
   </body>
 </html>
